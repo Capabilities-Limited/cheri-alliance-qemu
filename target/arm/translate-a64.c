@@ -254,11 +254,8 @@ static void gen_a64_update_pc_safe(DisasContext *s, target_long diff)
 // Set the link register (30) to point the next instruction
 static void gen_a64_set_link_register(DisasContext *s)
 {
-
-    uint64_t addr = s->base.pc_next;
 #ifdef TARGET_CHERI
-
-
+    uint64_t addr = s->base.pc_next;
     bool c64 = IS_C64(s);
 
     if (c64) {
@@ -284,7 +281,7 @@ static void gen_a64_set_link_register(DisasContext *s)
     else
         gen_lazy_cap_set_int(s, 30);
 #else
-    tcg_gen_movi_i64(cpu_reg(s, 30), addr);
+    gen_pc_plus_diff(s, cpu_reg(s, 30), curr_insn_len(s));
 #endif
 }
 
@@ -680,7 +677,7 @@ static void gen_goto_tb(DisasContext *s, int n, int64_t diff)
          * can thus avoid many updates to the PC.
          */
         if (TARGET_TB_PCREL) {
-            gen_a64_update_pc(s, diff);
+            gen_a64_update_pc_safe(s, diff);
             tcg_gen_goto_tb(n);
         } else {
             tcg_gen_goto_tb(n);
@@ -2853,12 +2850,23 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
             tcg_gen_add_i64(dst_tmp, dst_tmp, dst);
             dst = dst_tmp;
         }
-#endif
         gen_a64_set_pc(s, dst);
         /* BLR also needs to load return address */
-        if(opc == 1) {
+        if (opc == 1) {
             gen_a64_set_link_register(s);
         }
+#else
+        if (opc == 1) {
+            /* BLR also needs to load return address */
+            if (rn == 30) {
+                TCGv_i64 tmp = new_tmp_a64(s);
+                tcg_gen_mov_i64(tmp, dst);
+                dst = tmp;
+            }
+            gen_a64_set_link_register(s);
+        }
+        gen_a64_set_pc(s, dst);
+#endif
         break;
 
     case 8: /* BRAA */
@@ -2880,12 +2888,26 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
             }
         } else {
             dst = cpu_reg(s, rn);
+#ifndef TARGET_CHERI
+            if (opc == 9 && rn == 30) {
+                dst = new_tmp_a64(s);
+                tcg_gen_mov_i64(dst, cpu_X[30]);
+            }
+#endif
         }
+#ifdef TARGET_CHERI
         gen_a64_set_pc(s, dst);
         /* BLRAA also needs to load return address */
         if (opc == 9) {
             gen_a64_set_link_register(s);
         }
+#else
+        /* BLRAA also needs to load return address */
+        if (opc == 9) {
+            gen_a64_set_link_register(s);
+        }
+        gen_a64_set_pc(s, dst);
+#endif
         break;
 
     case 4: /* ERET */
@@ -3510,8 +3532,8 @@ static void disas_ld_lit(DisasContext *s, uint32_t insn)
 
     tcg_rt = cpu_reg(s, rt);
 
-    dirty_addr = tcg_const_i64(s->pc_curr + imm);
-
+    dirty_addr = new_tmp_a64(s);
+    gen_pc_plus_diff(s, dirty_addr, imm);
     clean_addr = arm_bounds_checked(s, dirty_addr, 1 << size, 0, true, false,
                                     false, false);
 
@@ -3524,7 +3546,6 @@ static void disas_ld_lit(DisasContext *s, uint32_t insn)
         do_gpr_ld(s, tcg_rt, clean_addr, size + is_signed * MO_SIGN,
                   false, true, rt, iss_sf, false);
     }
-    tcg_temp_free_i64(dirty_addr);
 }
 
 /*
@@ -15752,7 +15773,7 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
 void cheri_tcg_save_pc(DisasContextBase *db)
 {
     DisasContext *dc = container_of(db, DisasContext, base);
-    gen_a64_update_pc(dc, 4);
+    gen_a64_update_pc(dc, db->pc_next - dc->pc_curr);
 }
 
 void cheri_tcg_prepare_for_unconditional_exception(DisasContextBase *db)

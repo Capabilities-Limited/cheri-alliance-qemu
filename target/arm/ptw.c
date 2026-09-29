@@ -2734,8 +2734,7 @@ static bool get_phys_addr_twostage(CPUARMState *env, S1Translate *ptw,
     /* Combine the S1 and S2 perms.  */
     // LC_CLEAR and LC_TRAP are sadly inverted as they DISALLOW behavior
     result->f.prot = ((result->f.prot ^ PAGE_C_BITS) &
-                      (result->f.prot ^ PAGE_C_BITS)) ^ PAGE_C_BITS;
-    result->f.prot &= s1_prot;
+                      (s1_prot ^ PAGE_C_BITS)) ^ PAGE_C_BITS;
 
     /* If S2 fails, return early.  */
     if (ret) {
@@ -2840,11 +2839,6 @@ static bool get_phys_addr_with_struct(CPUARMState *env, S1Translate *ptw,
         break;
     }
 
-    /* The page table entries may downgrade secure to non-secure, but
-     * cannot upgrade an non-secure translation regime's attributes
-     * to secure.
-     */
-    result->f.attrs.secure = is_secure;
     result->f.attrs.user = regime_is_user(env, mmu_idx);
 
     /* Fast Context Switch Extension. This doesn't exist at all in v8.
@@ -2876,17 +2870,16 @@ static bool get_phys_addr_with_struct(CPUARMState *env, S1Translate *ptw,
             ret = get_phys_addr_pmsav5(env, address, access_type, mmu_idx,
                                        is_secure, result, fi);
         }
-        qemu_log_mask(
-            CPU_LOG_MMU,
-            "PMSA MPU lookup for %s at 0x%08" PRIx32
-            " mmu_idx %u -> %s (prot %c%c%c)\n",
-            access_type == MMU_DATA_LOAD
-                ? "reading"
-                : (access_type == MMU_DATA_STORE ? "writing" : "execute"),
-            (uint32_t)address, mmu_idx, ret ? "Miss" : "Hit",
-            result->f.prot & PAGE_READ ? 'r' : '-',
-            result->f.prot & PAGE_WRITE ? 'w' : '-',
-            result->f.prot & PAGE_EXEC ? 'x' : '-');
+        qemu_log_mask(CPU_LOG_MMU,
+                      "PMSA MPU lookup for %s at 0x%08" PRIx32
+                      " mmu_idx %u -> %s (prot %c%c%c)\n",
+                      access_type == MMU_DATA_LOAD ? "reading" :
+                      (access_type == MMU_DATA_STORE ? "writing" : "execute"),
+                      (uint32_t)address, mmu_idx,
+                      ret ? "Miss" : "Hit",
+                      result->f.prot & PAGE_READ ? 'r' : '-',
+                      result->f.prot & PAGE_WRITE ? 'w' : '-',
+                      result->f.prot & PAGE_EXEC ? 'x' : '-');
 
         return ret;
     }

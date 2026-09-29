@@ -31,7 +31,11 @@
 # define TARGET_PAGE_BITS_VARY
 # define TARGET_PAGE_BITS_MIN  10
 
-# define TARGET_TB_PCREL 1
+# ifdef TARGET_CHERI
+#  define TARGET_TB_PCREL 0
+# else
+#  define TARGET_TB_PCREL 1
+# endif
 
 /*
  * Cache the attrs and shareability fields from the page table entry.
