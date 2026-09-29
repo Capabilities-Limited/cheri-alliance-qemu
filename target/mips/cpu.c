@@ -170,11 +170,7 @@ static vaddr mips_cpu_get_pc(CPUState *cs)
 {
     MIPSCPU *cpu = MIPS_CPU(cs);
 
-#ifdef TARGET_CHERI
-    return cpu->env.active_tc.PCC._cr_cursor;
-#else
-    return cpu->env.active_tc.PC;
-#endif
+    return cpu_get_recent_pc(&cpu->env);
 }
 
 static bool mips_cpu_has_work(CPUState *cs)

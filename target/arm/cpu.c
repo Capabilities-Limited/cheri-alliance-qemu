@@ -91,11 +91,7 @@ static vaddr arm_cpu_get_pc(CPUState *cs)
     CPUARMState *env = &cpu->env;
 
     if (is_a64(env)) {
-#ifdef TARGET_CHERI
-        return env->pc.cap._cr_cursor;
-#else
-        return env->pc;
-#endif
+        return get_aarch_reg_as_x(&env->pc);
     } else {
         return env->regs[15];
     }

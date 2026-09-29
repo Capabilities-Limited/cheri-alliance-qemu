@@ -619,11 +619,8 @@ static vaddr riscv_cpu_get_pc(CPUState *cs)
 {
     RISCVCPU *cpu = RISCV_CPU(cs);
     CPURISCVState *env = &cpu->env;
-#ifdef TARGET_CHERI
-    vaddr pc = env->pcc._cr_cursor;
-#else
-    vaddr pc = env->pc;
-#endif
+    target_ulong pc = cpu_get_recent_pc(env);
+
     /* Match cpu_get_tb_cpu_state. */
     if (env->xl == MXL_RV32) {
         return pc & UINT32_MAX;
