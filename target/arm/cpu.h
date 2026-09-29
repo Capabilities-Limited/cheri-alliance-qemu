@@ -1434,11 +1434,7 @@ FIELD(CPTR_EL3, TTA, 20, 1)
 FIELD(CPTR_EL3, TAM, 30, 1)
 FIELD(CPTR_EL3, TCPAC, 31, 1)
 
-#define MDCR_MTPME    (1U << 28)
-#define MDCR_TDCC     (1U << 27)
-#define MDCR_HLP      (1U << 26)  /* MDCR_EL2 */
-#define MDCR_SCCD     (1U << 23)  /* MDCR_EL3 */
-#define MDCR_HCCD     (1U << 23)  /* MDCR_EL2 */
+#define CPTR_TTA_EL2  (1U << 28)
 #define CPTR_FPEN     (0b11U << 20)
 #define CPTR_FPEN_LO  (1U << 20)
 #define CPTR_FPEN_HI  (1U << 21)
@@ -1451,6 +1447,11 @@ FIELD(CPTR_EL3, TCPAC, 31, 1)
 #define CPTR_EC       (1U << 9)
 #define CPTR_TC       (1U << 9)
 
+#define MDCR_MTPME    (1U << 28)
+#define MDCR_TDCC     (1U << 27)
+#define MDCR_HLP      (1U << 26)  /* MDCR_EL2 */
+#define MDCR_SCCD     (1U << 23)  /* MDCR_EL3 */
+#define MDCR_HCCD     (1U << 23)  /* MDCR_EL2 */
 #define MDCR_EPMAD    (1U << 21)
 #define MDCR_EDAD     (1U << 20)
 #define MDCR_TTRF     (1U << 19)
