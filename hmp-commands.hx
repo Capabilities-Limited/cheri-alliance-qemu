@@ -1784,8 +1784,10 @@ ERST
     },
 
 SRST
-``cheri_trace_buffer_size`` *buffer_size*
-  Set the instruction trace buffer size to the given number of entries..
+``cancel_vcpu_dirty_limit``
+  Cancel dirty page rate limit on virtual CPU, the information about all the
+  virtual CPU dirty limit status can be observed with ``info vcpu_dirty_limit``
+  command.
 ERST
 
     {
@@ -1797,10 +1799,8 @@ ERST
     },
 
 SRST
-``cancel_vcpu_dirty_limit``
-  Cancel dirty page rate limit on virtual CPU, the information about all the
-  virtual CPU dirty limit status can be observed with ``info vcpu_dirty_limit``
-  command.
+``cheri_trace_buffer_size`` *buffer_size*
+  Set the instruction trace buffer size to the given number of entries..
 ERST
 
     {
