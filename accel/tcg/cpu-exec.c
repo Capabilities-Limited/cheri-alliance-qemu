@@ -172,7 +172,6 @@ uint32_t curr_cflags(CPUState *cpu)
     return cflags;
 }
 
-
 struct tb_desc {
     target_ulong pc;
     target_ulong cs_base;
@@ -193,8 +192,10 @@ static bool tb_lookup_cmp(const void *p, const void *d)
 
     if ((TARGET_TB_PCREL || tb_pc(tb) == desc->pc) &&
         tb_page_addr0(tb) == desc->page_addr0 &&
-        tb->cs_base == desc->cs_base && tb->pcc_base == desc->pcc_base &&
-        tb->pcc_top == desc->pcc_top && tb->cheri_flags == desc->cheri_flags &&
+        tb->cs_base == desc->cs_base &&
+        tb->pcc_base == desc->pcc_base &&
+        tb->pcc_top == desc->pcc_top &&
+        tb->cheri_flags == desc->cheri_flags &&
         tb->flags == desc->flags &&
         tb->trace_vcpu_dstate == desc->trace_vcpu_dstate &&
         tb_cflags(tb) == desc->cflags) {
@@ -594,7 +595,6 @@ void cpu_exec_step_atomic(CPUState *cpu)
     cpu->running = false;
     end_exclusive();
 }
-
 
 void tb_set_jmp_target(TranslationBlock *tb, int n, uintptr_t addr)
 {

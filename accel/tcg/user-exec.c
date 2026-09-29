@@ -197,6 +197,8 @@ probe_access_inlined(CPUArchState *env, target_ulong addr, int size,
     return size ? g2h(env_cpu(env), addr) : NULL;
 }
 
+#include "probe-access.inc.c"
+
 tb_page_addr_t get_page_addr_code_hostp(CPUArchState *env, target_ulong addr,
                                         void **hostp)
 {
@@ -211,7 +213,6 @@ tb_page_addr_t get_page_addr_code_hostp(CPUArchState *env, target_ulong addr,
     return addr;
 }
 
-#include "probe-access.inc.c"
 void page_reset_target_data(target_ulong start, target_ulong end)
 {
 #ifdef TARGET_PAGE_DATA_SIZE
