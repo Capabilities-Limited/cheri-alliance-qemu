@@ -2019,19 +2019,11 @@ static target_ulong riscv_transformed_insn(CPURISCVState *env,
         }
     }
 
-#ifdef TARGET_CHERI
     if (access_size) {
-        xinsn = SET_RS1(
-            xinsn, (taddr - (get_without_decompress_cursor(env, access_rs1) +
-                             access_imm)) &
-                       (access_size - 1));
+        xinsn = SET_RS1(xinsn, (taddr - (gpr_int_value(env, access_rs1) +
+                                         access_imm)) & (access_size - 1));
     }
-#else
-    if (access_size) {
-        xinsn = SET_RS1(xinsn, (taddr - (env->gpr[access_rs1] + access_imm)) &
-                                   (access_size - 1));
-    }
-#endif
+
     return xinsn;
 }
 #endif /* !CONFIG_USER_ONLY */
@@ -2246,6 +2238,7 @@ void riscv_cpu_do_interrupt(CPUState *cs)
         env->stval = tval;
         riscv_log_instr_csr_changed(env, CSR_STVAL);
         env->htval = htval;
+        env->htinst = tinst;
         riscv_log_instr_csr_changed(env, CSR_HTVAL);
 
 #ifdef TARGET_CHERI_RISCV_STD_093
@@ -2264,7 +2257,6 @@ void riscv_cpu_do_interrupt(CPUState *cs)
         target_ulong new_pc = (stvec >> 2 << 2) +
             ((async && (stvec & 3) == 1) ? cause * 4 : 0);
         riscv_update_pc_for_exc_handler(env, &env->stvecc, new_pc);
-        env->htinst = tinst;
         riscv_cpu_set_mode(env, PRV_S);
     } else {
         /* handle the trap in M-mode */
@@ -2299,6 +2291,7 @@ void riscv_cpu_do_interrupt(CPUState *cs)
         env->mtval = tval;
         riscv_log_instr_csr_changed(env, CSR_MTVAL);
         env->mtval2 = mtval2;
+        env->mtinst = tinst;
 #ifdef TARGET_CHERI_RISCV_STD_093
         /*
          * We do not set the mtval2 to guest_phys_fault_add in the
@@ -2337,7 +2330,6 @@ void riscv_cpu_do_interrupt(CPUState *cs)
         }
 
         riscv_update_pc_for_exc_handler(env, &env->mtvecc, new_pc);
-        env->mtinst = tinst;
         riscv_cpu_set_mode(env, PRV_M);
     }
 

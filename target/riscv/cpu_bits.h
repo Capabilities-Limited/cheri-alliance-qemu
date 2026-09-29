@@ -275,10 +275,6 @@
 #define CSR_VSEPCC          CSR_VSEPC
 #endif
 
-/* Machine Configuration CSRs */
-#define CSR_MENVCFG         0x30A
-#define CSR_MENVCFGH        0x31A
-
 #ifdef TARGET_CHERI_RISCV_STD_093
 #define CSR_STVAL2          0x14b
 #define CSR_VSTVAL2         0x24b

@@ -372,9 +372,6 @@ struct CPUArchState {
     /* PMU event selector configured values. First three are unused*/
     target_ulong mhpmevent_val[RV_MAX_MHPMEVENTS];
 
-    /* PMU event selector configured values for RV32*/
-    target_ulong mhpmeventh_val[RV_MAX_MHPMEVENTS];
-
 #ifdef TARGET_CHERI
     /* zstid registers */
     cap_register_t mtidc;
@@ -398,6 +395,8 @@ struct CPUArchState {
     cap_register_t vstdc; /* Virtual Supervisor trap data cap */
 #endif
 
+    /* PMU event selector configured values for RV32*/
+    target_ulong mhpmeventh_val[RV_MAX_MHPMEVENTS];
 
     /* temporary htif regs */
     uint64_t mfromhost;

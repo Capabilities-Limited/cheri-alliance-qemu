@@ -87,13 +87,28 @@ struct isa_ext_data {
 static const struct isa_ext_data isa_edata_arr[] = {
     ISA_EXT_DATA_ENTRY(h, false, PRIV_VERSION_1_12_0, ext_h),
     ISA_EXT_DATA_ENTRY(v, false, PRIV_VERSION_1_12_0, ext_v),
+    ISA_EXT_DATA_ENTRY(zicbom, true, PRIV_VERSION_1_12_0, ext_icbom),
+    ISA_EXT_DATA_ENTRY(zicboz, true, PRIV_VERSION_1_12_0, ext_icboz),
     ISA_EXT_DATA_ENTRY(zicsr, true, PRIV_VERSION_1_10_0, ext_icsr),
     ISA_EXT_DATA_ENTRY(zifencei, true, PRIV_VERSION_1_10_0, ext_ifencei),
     ISA_EXT_DATA_ENTRY(zihintpause, true, PRIV_VERSION_1_10_0, ext_zihintpause),
+#ifdef TARGET_CHERI_RISCV_STD_093
+    ISA_EXT_DATA_ENTRY(zish4add, true, PRIV_VERSION_1_12_0, ext_zish4add),
+#endif
     ISA_EXT_DATA_ENTRY(zfh, true, PRIV_VERSION_1_12_0, ext_zfh),
     ISA_EXT_DATA_ENTRY(zfhmin, true, PRIV_VERSION_1_12_0, ext_zfhmin),
     ISA_EXT_DATA_ENTRY(zfinx, true, PRIV_VERSION_1_12_0, ext_zfinx),
     ISA_EXT_DATA_ENTRY(zdinx, true, PRIV_VERSION_1_12_0, ext_zdinx),
+    ISA_EXT_DATA_ENTRY(zca, true, PRIV_VERSION_1_12_0, ext_zca),
+    ISA_EXT_DATA_ENTRY(zcb, true, PRIV_VERSION_1_12_0, ext_zcb),
+    ISA_EXT_DATA_ENTRY(zcd, true, PRIV_VERSION_1_12_0, ext_zcd),
+    ISA_EXT_DATA_ENTRY(zcf, true, PRIV_VERSION_1_12_0, ext_zcf),
+#ifdef TARGET_CHERI_RISCV_STD_093
+    ISA_EXT_DATA_ENTRY(zcherihybrid, true, PRIV_VERSION_1_12_0, ext_zyhybrid),
+    ISA_EXT_DATA_ENTRY(zcherilevels, true, PRIV_VERSION_1_12_0, ext_zylevels1),
+    ISA_EXT_DATA_ENTRY(zcheripte, true, PRIV_VERSION_1_12_0, cheri_pte),
+    ISA_EXT_DATA_ENTRY(zcheripurecap, true, PRIV_VERSION_1_12_0, ext_cheri),
+#endif
     ISA_EXT_DATA_ENTRY(zba, true, PRIV_VERSION_1_12_0, ext_zba),
     ISA_EXT_DATA_ENTRY(zbb, true, PRIV_VERSION_1_12_0, ext_zbb),
     ISA_EXT_DATA_ENTRY(zbc, true, PRIV_VERSION_1_12_0, ext_zbc),
@@ -101,12 +116,6 @@ static const struct isa_ext_data isa_edata_arr[] = {
     ISA_EXT_DATA_ENTRY(zbkc, true, PRIV_VERSION_1_12_0, ext_zbkc),
     ISA_EXT_DATA_ENTRY(zbkx, true, PRIV_VERSION_1_12_0, ext_zbkx),
     ISA_EXT_DATA_ENTRY(zbs, true, PRIV_VERSION_1_12_0, ext_zbs),
-    ISA_EXT_DATA_ENTRY(zca, true, PRIV_VERSION_1_12_0, ext_zca),
-    ISA_EXT_DATA_ENTRY(zcb, true, PRIV_VERSION_1_12_0, ext_zcb),
-    ISA_EXT_DATA_ENTRY(zcd, true, PRIV_VERSION_1_12_0, ext_zcd),
-    ISA_EXT_DATA_ENTRY(zcf, true, PRIV_VERSION_1_12_0, ext_zcf),
-    ISA_EXT_DATA_ENTRY(zicbom, true, PRIV_VERSION_1_12_0, ext_icbom),
-    ISA_EXT_DATA_ENTRY(zicboz, true, PRIV_VERSION_1_12_0, ext_icboz),
     ISA_EXT_DATA_ENTRY(zk, true, PRIV_VERSION_1_12_0, ext_zk),
     ISA_EXT_DATA_ENTRY(zkn, true, PRIV_VERSION_1_12_0, ext_zkn),
     ISA_EXT_DATA_ENTRY(zknd, true, PRIV_VERSION_1_12_0, ext_zknd),
@@ -129,13 +138,6 @@ static const struct isa_ext_data isa_edata_arr[] = {
 #if !defined(TARGET_CHERI_RISCV_V9)
     ISA_EXT_DATA_ENTRY(svnapot, true, PRIV_VERSION_1_12_0, ext_svnapot),
     ISA_EXT_DATA_ENTRY(svpbmt, true, PRIV_VERSION_1_12_0, ext_svpbmt),
-#endif
-#ifdef TARGET_CHERI_RISCV_STD_093
-    ISA_EXT_DATA_ENTRY(zcherihybrid, true,PRIV_VERSION_1_12_0, ext_zyhybrid),
-    ISA_EXT_DATA_ENTRY(zcheripurecap, true, PRIV_VERSION_1_12_0, ext_cheri),
-    ISA_EXT_DATA_ENTRY(zcheripte, true, PRIV_VERSION_1_12_0, cheri_pte ),
-    ISA_EXT_DATA_ENTRY(zcherilevels, true, PRIV_VERSION_1_12_0, ext_zylevels1),
-    ISA_EXT_DATA_ENTRY(zish4add, true, PRIV_VERSION_1_12_0, ext_zish4add),
 #endif
     ISA_EXT_DATA_ENTRY(xventanacondops, true, PRIV_VERSION_1_12_0, ext_XVentanaCondOps),
 };
@@ -967,6 +969,9 @@ static void riscv_debug_excp_handler(CPUState *cs)
         return;
     }
 #endif
+#ifndef CONFIG_USER_ONLY
+    riscv_cpu_debug_excp_handler(cs);
+#endif
 }
 
 static void riscv_cpu_reset(DeviceState *dev)
@@ -1478,8 +1483,8 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
         cpu->cfg.lvbits = (uint8_t)cpu->cfg.ext_zylevels1;
 #endif
     }
-#endif
     riscv_set_feature(env, RISCV_FEATURE_STID);
+#endif
 #ifndef CONFIG_USER_ONLY
     if (cpu->cfg.pmu_num) {
         if (!riscv_pmu_init(cpu, cpu->cfg.pmu_num) && cpu->cfg.ext_sscofpmf) {

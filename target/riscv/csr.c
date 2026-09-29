@@ -4011,16 +4011,8 @@ RISCVException riscv_csrrw_check(CPURISCVState *env, int csrno,
     int read_only = get_field(csrno, 0xC00) == 3;
     int csr_min_priv = csr_ops[csrno].min_priv_ver;
 
-     /* ensure the CSR extension is enabled. */
-     if (!cpu->cfg.ext_icsr) {
-         return RISCV_EXCP_ILLEGAL_INST;
-     }
-
-    if (env->priv_ver < csr_min_priv) {
-        return RISCV_EXCP_ILLEGAL_INST;
-    }
-
-    if (write_mask && read_only) {
+    /* ensure the CSR extension is enabled. */
+    if (!cpu->cfg.ext_icsr) {
         return RISCV_EXCP_ILLEGAL_INST;
     }
 
@@ -4040,6 +4032,14 @@ RISCVException riscv_csrrw_check(CPURISCVState *env, int csrno,
         if (ret != RISCV_EXCP_NONE) {
             return ret;
         }
+    }
+
+    if (write_mask && read_only) {
+        return RISCV_EXCP_ILLEGAL_INST;
+    }
+
+    if (env->priv_ver < csr_min_priv) {
+        return RISCV_EXCP_ILLEGAL_INST;
     }
 #if !defined(CONFIG_USER_ONLY)
     int csr_priv, effective_priv = env->priv;
@@ -4462,7 +4462,7 @@ riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
     [CSR_MTVAL2]      = { "mtval2",      hmode,   read_mtval2,    write_mtval2,
 #endif
                           .min_priv_ver = PRIV_VERSION_1_12_0                },
-    [CSR_MTINST]      = { "mtinst",      hmode,   read_mtinst,    write_mtinst,
+    [CSR_MTINST]      = { "mtinst",      hmode,   read_mtinst,   write_mtinst,
                           .min_priv_ver = PRIV_VERSION_1_12_0                },
 
 #ifdef TARGET_CHERI_RISCV_STD_093
