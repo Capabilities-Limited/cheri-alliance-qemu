@@ -705,7 +705,7 @@ typedef enum {
     rv_op_cbo_zero,
     rv_op_cbo_zero_cap,
 
-    rv_op_packy,
+    rv_op_yhiw,
     rv_op_ymv,
     rv_op_yadd,
     rv_op_yaddrw,
@@ -725,7 +725,7 @@ typedef enum {
     rv_op_ysh4add_uw,
     rv_op_yeq,
     rv_op_yss,
-    rv_op_ysunseal,
+    rv_op_yunseals,
     rv_op_ybld,
     rv_op_yamask,
     rv_op_ybaser,
@@ -735,15 +735,15 @@ typedef enum {
     rv_op_ytagr,
     rv_op_ytyper,
     rv_op_ymoder,
-    rv_op_ysentry,
+    rv_op_yhir,
+    rv_op_yseale,
     rv_op_yaddi,
     rv_op_ybndswi,
     rv_op_ly,
     rv_op_sy,
     rv_op_lr_y,
     rv_op_amoswap_y,
-    rv_op_sc_y,
-    rv_op_srliy
+    rv_op_sc_y
 } rv_op;
 
 /* structures */
@@ -1664,7 +1664,7 @@ const rv_opcode_data opcode_data[] = {
     [rv_op_cbo_zero_cap] = { "cbo.zero", rv_codec_cbo_rs1, rv_fmt_cbo_cs1, NULL, 0, 0, 0 },
 
     // RVY
-    [rv_op_packy] = { "packy", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
+    [rv_op_yhiw] = { "yhiw", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
     [rv_op_ymv] = { "ymv", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
     [rv_op_yadd] = { "yadd", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
     [rv_op_yaddrw] = { "yaddrw", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
@@ -1684,7 +1684,7 @@ const rv_opcode_data opcode_data[] = {
     [rv_op_ysh4add_uw] = { "ysh4add.uw", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
     [rv_op_yeq] = { "yeq", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
     [rv_op_yss] = { "yss", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-    [rv_op_ysunseal] = { "ysunseal", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
+    [rv_op_yunseals] = { "yunseals", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
     [rv_op_ybld] = { "ybld", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
     [rv_op_yamask] = { "yamask", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
     [rv_op_ybaser] = { "ybaser", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
@@ -1694,15 +1694,15 @@ const rv_opcode_data opcode_data[] = {
     [rv_op_ytagr] = { "ytagr", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
     [rv_op_ytyper] = { "ytyper", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
     [rv_op_ymoder] = { "ymoder", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-    [rv_op_ysentry] = { "ysentry", rv_codec_r, rv_fmt_rd_rs2, NULL, 0, 0, 0 },
+    [rv_op_yhir] = { "yhir", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
+    [rv_op_yseale] = { "yseale", rv_codec_r, rv_fmt_rd_rs2, NULL, 0, 0, 0 },
     [rv_op_yaddi] = { "yaddi", rv_codec_i, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
     [rv_op_ybndswi] = { "ybndswi", rv_codec_ybndswi, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
     [rv_op_ly] = { "ly", rv_codec_i, rv_fmt_rd_offset_rs1, NULL, 0, 0, 0 },
     [rv_op_sy] = { "sy", rv_codec_s, rv_fmt_rs2_offset_rs1, NULL, 0, 0, 0 },
     [rv_op_lr_y] = { "lr.y", rv_codec_r_l, rv_fmt_aqrl_rd_rs1, NULL, 0, 0, 0 },
     [rv_op_amoswap_y] = { "amoswap.y", rv_codec_r, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-    [rv_op_sc_y] = { "sc.y", rv_codec_r, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-    [rv_op_srliy] = { "srli.y", rv_codec_i_sh7, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 }
+    [rv_op_sc_y] = { "sc.y", rv_codec_r, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 }
 };
 
 /* CSR names */
@@ -1994,11 +1994,11 @@ static rv_opcode decode_cheri_rvy(rv_inst inst) {
     switch (func3) {
     case 0:
         switch (func7) {
-        case 1: return rv_op_packy;
+        case 1: return rv_op_yhiw;
         case 3: return rs2 == 0 ? rv_op_ymv : rv_op_yadd;
         case 5: return rv_op_ysh1add;
         case 6: return rv_op_yeq;
-        case 7: return rv_op_ysunseal;
+        case 7: return rv_op_yunseals;
         case 11: return rv_op_yaddrw;
         case 13: return rv_op_ysh2add;
         case 14: return rv_op_yss;
@@ -2006,7 +2006,7 @@ static rv_opcode decode_cheri_rvy(rv_inst inst) {
         case 19: return rv_op_ypermc;
         case 21: return rv_op_ysh3add;
         /* cs1 != 0 is reserved to decode as a future YSEAL. */
-        case 23: return rs1 == 0 ? rv_op_ysentry : rv_op_illegal;
+        case 23: return rs1 == 0 ? rv_op_yseale : rv_op_illegal;
         case 27: return rv_op_ybndsw;
         case 29: return rv_op_ysh4add;
         case 35: return rv_op_ybndsrw;
@@ -2031,6 +2031,7 @@ static rv_opcode decode_cheri_rvy(rv_inst inst) {
             case 4: return rv_op_ytagr;
             case 5: return rv_op_ytyper;
             case 6: return rv_op_ymoder;
+            case 7: return rv_op_yhir;
             }
             break;
         }
@@ -2047,8 +2048,6 @@ static rv_opcode decode_cheri_rvy(rv_inst inst) {
     case 4: return rv_op_yaddi;
     case 5:
         if ((inst >> 29) == 7) return rv_op_ybndswi;
-        /* srliy has a 7 bit shamt, so only the top five bits must be zero. */
-        if ((inst >> 27) == 0) return rv_op_srliy;
         break;
     }
     return rv_op_illegal;

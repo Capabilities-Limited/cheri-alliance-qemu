@@ -706,10 +706,10 @@ TRANSLATE_INT_CAP_HELPER(ylenr, cgetlen)
 TRANSLATE_INT_CAP_HELPER(ytopr, cgettop)
 #endif
 
-static bool trans_ysentry(DisasContext *ctx, arg_cc *a)
+static bool trans_yseale(DisasContext *ctx, arg_cc *a)
 {
 #ifndef TARGET_CHERI_RISCV_RVY
-    /* YSENTRY was moved into the base ISA in RVY v0.9.9. */
+    /* YSEALE was moved into the base ISA in RVY v0.9.9. */
     if (!ctx->cfg_ptr->ext_zysentry) {
         return false;
     }
@@ -732,10 +732,10 @@ TRANSLATE_INT_CAP_CAP_HELPER(yeq, cseqx)
 TRANSLATE_INT_CAP_CAP_HELPER(yss, scss)
 
 #ifdef TARGET_CHERI_RISCV_RVY
-TRANSLATE_CAP_CAP_CAP_HELPER(ysunseal, ysunseal)
+TRANSLATE_CAP_CAP_CAP_HELPER(yunseals, yunseals)
 TRANSLATE_CAP_CAP_INT(ypermc)
 
-static bool trans_packy(DisasContext *ctx, arg_crr *a)
+static bool trans_yhiw(DisasContext *ctx, arg_crr *a)
 {
     if (a->cd == 0) {
         return true;
@@ -746,7 +746,7 @@ static bool trans_packy(DisasContext *ctx, arg_crr *a)
     gen_get_gpr(ctx, rs1, a->rs1);
     gen_get_gpr(ctx, rs2, a->rs2);
 
-    gen_helper_packy(cpu_env, cd, rs1, rs2);
+    gen_helper_yhiw(cpu_env, cd, rs1, rs2);
 
     tcg_temp_free(rs1);
     tcg_temp_free(rs2);
@@ -778,12 +778,8 @@ static bool trans_ybndswi(DisasContext *ctx, arg_cci *a)
                                  &gen_helper_csetboundsexact);
 }
 
-static bool trans_srliy(DisasContext *ctx, arg_rci *a)
+static bool trans_yhir(DisasContext *ctx, arg_rc *a)
 {
-    /* Only a shift by the current XLEN (i.e. reading the metadata) is valid. */
-    if (a->imm != get_xlen(ctx)) {
-        return false;
-    }
     TCGv result = tcg_temp_new();
     gen_helper_cgethigh(result, cpu_env, tcg_constant_i32(a->cs1));
     gen_set_gpr(ctx, a->rd, result);
@@ -853,7 +849,7 @@ RVY_RENAMED(ymoder, gcmode)
 RVY_RENAMED(ybaser, gcbase)
 RVY_RENAMED(ylenr, gclen)
 
-RVY_RENAMED(ysentry, sentry)
+RVY_RENAMED(yseale, sentry)
 RVY_RENAMED(yadd, cadd)
 RVY_RENAMED(yaddrw, scaddr)
 RVY_RENAMED(ybndsw, scbnds)

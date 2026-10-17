@@ -266,7 +266,7 @@ static void rv64_codasip_a730_cpu_init(Object *obj)
 #endif
     cpu->cfg.ext_svinval = true;
 #if defined(TARGET_CHERI_RISCV_STD)
-    cpu->cfg.ext_zylevels1 = true;
+    cpu->cfg.ext_zylg = true;
     cpu->cfg.ext_svyrg = true;
     cpu->cfg.ext_cheri = true;
     cpu->cfg.ext_zyhybrid = true;
@@ -388,7 +388,7 @@ static void rv32_codasip_l730_cpu_init(Object *obj)
     cpu->cfg.ext_zbs =  true;
     cpu->cfg.ext_zfhmin = true;
 #if defined(TARGET_CHERI_RISCV_STD)
-    cpu->cfg.ext_zylevels1 = true;
+    cpu->cfg.ext_zylg = true;
     cpu->cfg.ext_cheri = true;
     cpu->cfg.ext_zyhybrid = true;
     cpu->cfg.ext_zysentry = true;
@@ -1063,9 +1063,9 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
         /* Temporary compatibility for scripts that uses cheri_levels=2 */
         if (cpu->cfg._compat_cheri_levels != 0) {
             if (cpu->cfg._compat_cheri_levels == 1) {
-                cpu->cfg.ext_zylevels1 = false;
+                cpu->cfg.ext_zylg = false;
             } else if (cpu->cfg._compat_cheri_levels == 2) {
-                cpu->cfg.ext_zylevels1 = true;
+                cpu->cfg.ext_zylg = true;
             } else {
                 error_setg(errp, "cheri_levels must be 1 or 2");
                 return;
@@ -1073,8 +1073,8 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
         }
         cpu->cfg.ext_zysentry = true;
 #endif
-        /* When Zylevels1 is enabled we have 1 level bits (local/global). */
-        cpu->cfg.lvbits = (uint8_t)cpu->cfg.ext_zylevels1;
+        /* When Zylg is enabled we have 1 level bits (local/global). */
+        cpu->cfg.lvbits = (uint8_t)cpu->cfg.ext_zylg;
 #endif
     }
 #endif
@@ -1213,7 +1213,7 @@ static Property riscv_cpu_extensions[] = {
 #elif defined(TARGET_CHERI_RISCV_STD)
     DEFINE_PROP_BOOL("y", RISCVCPU, cfg.ext_cheri, true),
     DEFINE_PROP_BOOL("Zyhybrid", RISCVCPU, cfg.ext_zyhybrid, true),
-    DEFINE_PROP_BOOL("Zylevels1", RISCVCPU, cfg.ext_zylevels1, false),
+    DEFINE_PROP_BOOL("Zylg", RISCVCPU, cfg.ext_zylg, false),
 #if defined(TARGET_CHERI_RISCV_RVY)
     DEFINE_PROP_BOOL("Svyrg", RISCVCPU, cfg.ext_svyrg, false),
     DEFINE_PROP_BOOL("x-rvy-strict-branches", RISCVCPU,
@@ -1472,7 +1472,7 @@ static void riscv_isa_string_ext(RISCVCPU *cpu, char **isa_str, int max_str_len)
 #if defined(TARGET_CHERI_RISCV_RVY)
         {"zyhybrid", cpu->cfg.ext_zyhybrid},
         {"zypurecap", cpu->cfg.ext_cheri},
-        {"zylevels1", cpu->cfg.ext_zylevels1 },
+        {"zylg", cpu->cfg.ext_zylg },
         {"svyrg", cpu->cfg.ext_svyrg},
 #elif defined(TARGET_CHERI_RISCV_STD_093)
         {"zcherihybrid", cpu->cfg.ext_zyhybrid},

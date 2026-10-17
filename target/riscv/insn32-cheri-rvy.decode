@@ -27,18 +27,13 @@
 &crc cd rs1 cs2
 @crc .......   ..... ..... ... ..... ....... &crc %cd %rs1 %cs2
 
-&rci rd cs1 imm
-
 @cci ............    ..... ... ..... ....... &cci %cd %cs1 imm=%imm_i
 
 %imm_ybndswi 20:9
 @ybndswi 111.........  ..... ... ..... ....... &cci %cd %cs1 imm=%imm_ybndswi
 
-%shamt_rvy 20:7
-@rci_shamt 00000.......  ..... ... ..... ....... &rci %rd %cs1 imm=%shamt_rvy
-
 ### Three operand instructions
-packy           0000001 ..... ..... 000 ..... 1111011 @crr ?pred_rvy
+yhiw            0000001 ..... ..... 000 ..... 1111011 @crr ?pred_rvy
 {
   ymv             0000011 00000 ..... 000 ..... 1111011 @cc ?pred_rvy
   yadd            0000011 ..... ..... 000 ..... 1111011 @ccr ?pred_rvy
@@ -62,7 +57,7 @@ ysh3add_uw      0110101 ..... ..... 000 ..... 1111011 @crc ?pred_rvy
 ysh4add_uw      0111101 ..... ..... 000 ..... 1111011 @crc ?pred_rvy
 yeq             0000110 ..... ..... 000 ..... 1111011 @rcc ?pred_rvy
 yss             0001110 ..... ..... 000 ..... 1111011 @rcc ?pred_rvy
-ysunseal        0000111 ..... ..... 000 ..... 1111011 @ccc ?pred_rvy
+yunseals        0000111 ..... ..... 000 ..... 1111011 @ccc ?pred_rvy
 ybld            0001111 ..... ..... 000 ..... 1111011 @ccc ?pred_rvy
 
 ### Two operand instructions
@@ -74,10 +69,11 @@ ylenr           1111010 00011 ..... 000 ..... 1111011 @rc ?pred_rvy
 ytagr           1111010 00100 ..... 000 ..... 1111011 @rc ?pred_rvy
 ytyper          1111010 00101 ..... 000 ..... 1111011 @rc ?pred_rvy
 ymoder          1111010 00110 ..... 000 ..... 1111011 @rc ?pred_hybrid ?pred_rvy
+yhir            1111010 00111 ..... 000 ..... 1111011 @rc ?pred_rvy
 
-# YSENTRY sources cs2; cs1 != 0 is reserved to decode as a future YSEAL.
+# YSEALE sources cs2; cs1 != 0 is reserved to decode as a future YSEAL.
 @cc_cs2 .......  ..... ..... ... ..... ....... &cc %cd cs1=%cs2
-ysentry         0010111 ..... 00000 000 ..... 1111011 @cc_cs2 ?pred_rvy
+yseale          0010111 ..... 00000 000 ..... 1111011 @cc_cs2 ?pred_rvy
 
 ### Instructions with immediate operands
 yaddi           ....... ..... ..... 100 ..... 1111011 @cci ?pred_rvy
@@ -91,6 +87,3 @@ sy              ....... ..... ..... 010 ..... 1111011 @s ?pred_rvy
 lr_y            00010.. 00000 ..... 011 ..... 1111011 @atom_ld ?pred_rvy
 amoswap_y       00001.. ..... ..... 011 ..... 1111011 @atom_st ?pred_rvy
 sc_y            00011.. ..... ..... 011 ..... 1111011 @atom_st ?pred_rvy
-
-### Shifts
-srliy           ....... ..... ..... 101 ..... 1111011 @rci_shamt ?pred_rvy

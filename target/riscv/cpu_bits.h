@@ -359,17 +359,35 @@
 #define CSR_DPCC            CSR_DPC
 #define CSR_DSCRATCH0C      CSR_DSCRATCH0
 #define CSR_DSCRATCH1C      CSR_DSCRATCH1
+
+#ifdef TARGET_CHERI_RISCV_STD_093
 #define CSR_DDDC            0x7bc
 #define CSR_DINFC           0x7bd
+#else
+#define CSR_DROOTCSEL       0x7bd
+#define CSR_DROOTC          0x7be
+#define CSR_DDDC            0x7bf
+#endif
 
 /* CHERI default data capability */
+#ifdef TARGET_CHERI_RISCV_STD_093
 #define CSR_DDC             0x416
+#else
+#define CSR_DDC             0x03f
+#endif
 
 /* CHERI thread ID registers*/
+#ifdef TARGET_CHERI_RISCV_STD_093
 #define CSR_MTIDC           0x780
 #define CSR_STIDC           0x580
 #define CSR_VSTIDC          0xa80
 #define CSR_UTIDC           0x480
+#else
+#define CSR_MTIDC           0x37f
+#define CSR_STIDC           0x17f
+#define CSR_VSTIDC          0x27f
+#define CSR_UTIDC           0x07f
+#endif
 
 #ifdef TARGET_CHERI_RISCV_V9
 /* Fake CSR numbers for the legacy *TDC registers */

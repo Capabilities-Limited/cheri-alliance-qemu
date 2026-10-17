@@ -593,7 +593,7 @@ void HELPER(ypermc)(CPUArchState *env, uint32_t cd, uint32_t cs1,
     helper_candperm(env, cd, cs1, ~mask);
 }
 
-void HELPER(packy)(CPUArchState *env, uint32_t cd, target_ulong rs1,
+void HELPER(yhiw)(CPUArchState *env, uint32_t cd, target_ulong rs1,
                    target_ulong rs2)
 {
     cap_register_t result;
@@ -602,7 +602,7 @@ void HELPER(packy)(CPUArchState *env, uint32_t cd, target_ulong rs1,
     update_capreg(env, cd, &result);
 }
 
-void HELPER(ysunseal)(CPUArchState *env, uint32_t cd,
+void HELPER(yunseals)(CPUArchState *env, uint32_t cd,
                       uint32_t cs1, uint32_t cs2)
 {
     const cap_register_t *auth = get_readonly_capreg(env, cs1);
@@ -610,7 +610,7 @@ void HELPER(ysunseal)(CPUArchState *env, uint32_t cd,
     cap_register_t result = *input;
 
     /*
-     * ysunseal unconditionally clears the otype to unsealed.
+     * yunseals unconditionally clears the otype to unsealed.
      * We use the raw update_otype helper directly to avoid assertion checks
      * in the wrappers (which fail if the input is unsealed or untagged).
      */

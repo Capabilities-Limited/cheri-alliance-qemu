@@ -595,12 +595,12 @@ struct RISCVCPUConfig {
     bool ext_cheri_v9; /* Temporary flag to support new semantics. */
 #elif defined(TARGET_CHERI_RISCV_STD)
     bool ext_zyhybrid;
-    bool ext_zylevels1;
+    bool ext_zylg;
 #ifdef TARGET_CHERI_RISCV_STD_093
     /* number of levels (Zcherilevels): 0 invalid, 1 disabled (default)) */
     uint8_t _compat_cheri_levels; /* To keep existing scripts working */
 #endif
-    uint8_t lvbits; /* Only 0 and 1 (Zylevels1) are currently supported. */
+    uint8_t lvbits; /* Only 0 and 1 (Zylg) are currently supported. */
     bool ext_svyrg;
     bool ext_zysentry;
 #ifdef TARGET_CHERI_RISCV_RVY
